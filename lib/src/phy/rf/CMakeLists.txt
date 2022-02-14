@@ -58,6 +58,11 @@ if(RF_FOUND)
     add_definitions(-DENABLE_SOAPYSDR)
     list(APPEND SOURCES_RF rf_soapy_imp.c)
   endif (SOAPYSDR_FOUND AND ENABLE_SOAPYSDR)
+  
+  if(XTRX_FOUND)
+     add_definitions(-DENABLE_XTRX)
+    list(APPEND SOURCES_RF rf_xtrx_imp.c)
+  endif(XTRX_FOUND)
 
   if(SKIQ_FOUND)
     add_executable(skiq_pps_test skiq_pps_test.c)
@@ -86,6 +91,10 @@ if(RF_FOUND)
   if (SOAPYSDR_FOUND AND ENABLE_SOAPYSDR)
     target_link_libraries(srsran_rf ${SOAPYSDR_LIBRARIES})
   endif (SOAPYSDR_FOUND AND ENABLE_SOAPYSDR)
+
+  if(XTRX_FOUND)
+    target_link_libraries(srsran_rf ${XTRX_LIBRARIES})
+  endif(XTRX_FOUND)
 
   if(SKIQ_FOUND)
     target_link_libraries(srsran_rf ${SKIQ_LIBRARIES} rt)
