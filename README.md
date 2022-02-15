@@ -1,4 +1,4 @@
-srsRAN Support for xtrx sdr as rf fronend.
+srsRAN - Support for Xtrx Sdr.
 ======
 
 [![Build Status](https://app.travis-ci.com/srsran/srsRAN.svg?branch=master)](https://app.travis-ci.com/github/srsran/srsRAN)
