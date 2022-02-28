@@ -292,11 +292,11 @@ double rf_xtrx_set_tx_srate(void *h_,double freq)
 	res = xtrx_tune_tx_bandwidth(h->dev,XTRX_CH_AB,srate_hz,&actualbw);
 	if(res != 0)
 	{
-		XTRX_RF_ERROR("xtrx_tune_tx_bandwidth: can't rx bandwidth %f,err: %d\n",srate_hz,res);
+		XTRX_RF_ERROR("xtrx_tune_tx_bandwidth: can't tx bandwidth %f,err: %d\n",srate_hz,res);
 	}
 	else
 	{
-		XTRX_RF_INFO("xtrx_tune_tx_bandwidth rx bandwidth %.2f Mhz\n",(actualbw / 1e6));
+		XTRX_RF_INFO("xtrx_tune_tx_bandwidth tx bandwidth %.2f Mhz\n",(actualbw / 1e6));
 	}
 
 	return(srate_hz);
