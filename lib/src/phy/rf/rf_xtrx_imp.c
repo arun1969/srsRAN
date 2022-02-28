@@ -34,8 +34,8 @@ static void *xtrx_error_handler_arg = NULL;
 
 void rf_xtrx_suppress_stdout(void *h_)
 {
-	xtrx_log_setlevel(XTRX_LOG_WARNING,NULL);
-	rf_xtrx_logging_level = XTRX_LOG_WARNING;
+	xtrx_log_setlevel(XTRX_LOG_INFO,NULL);
+	rf_xtrx_logging_level = XTRX_LOG_INFO;
 }
 
 void rf_xtrx_register_error_handler(void *h_,srsran_rf_error_handler_t new_handler,void *arg)
@@ -213,7 +213,10 @@ int rf_xtrx_close(void *h_)
 	rf_xtrx_handler_t *h = h_;
 
 	if(h != NULL)
+	{
 		res = xtrx_stop(h->dev,XTRX_TRX);
+		xtrx_close(h->dev);
+	}
 
 	return(res);
 }
@@ -308,11 +311,11 @@ int rf_xtrx_set_rx_gain(void *h_,double gain)
 	res = xtrx_set_gain(h->dev,XTRX_CH_AB,XTRX_RX_LNA_GAIN,gain,&actual);
 	if(res != 0)
 	{
-		XTRX_RF_ERROR("rf_xtrx_set_rx_gain: can't rx gain %f,err: %d\n",gain,res);
+		XTRX_RF_ERROR("xtrx_set_gain: can't rx gain %f,err: %d\n",gain,res);
 	}
 	else
 	{
-		XTRX_RF_INFO("rf_xtrx_set_rx_gain: rx gain %f\n",actual);
+		XTRX_RF_INFO("xtrx_set_gain: rx gain %f\n",actual);
 	}
 
 	h->rx_gain = actual;
@@ -333,11 +336,11 @@ int rf_xtrx_set_tx_gain(void *h_,double gain)
 	res = xtrx_set_gain(h->dev,XTRX_CH_AB,XTRX_TX_PAD_GAIN,gain,&actual);
 	if(res != 0)
 	{
-		XTRX_RF_ERROR("rf_xtrx_set_tx_gain: can't tx gain %f,err: %d\n",gain,res);
+		XTRX_RF_ERROR("xtrx_set_gain: can't tx gain %f,err: %d\n",gain,res);
 	}
 	else
 	{
-		XTRX_RF_INFO("rf_xtrx_set_tx_gain: tx gain %f\n",actual);
+		XTRX_RF_INFO("xtrx_set_gain: tx gain %f\n",actual);
 	}
 
 	h->tx_gain = actual;
@@ -389,11 +392,11 @@ double rf_xtrx_set_rx_freq(void *h_,uint32_t ch,double freq)
 	res = xtrx_tune(h->dev,XTRX_TUNE_RX_FDD,freq,&actual);
 	if(res != 0)
 	{
-		XTRX_RF_ERROR("rf_xtrx_set_rx_freq: can't freq %f,err: %d\n",freq,res);
+		XTRX_RF_ERROR("xtrx_tune: can't freq %f,err: %d\n",freq,res);
 	}
 	else
 	{
-		XTRX_RF_INFO("rf_xtrx_set_rx_freq: actual freq %.2f Mhz\n",(actual / 1e6));
+		XTRX_RF_INFO("xtrx_tune: actual freq %.2f Mhz\n",(actual / 1e6));
 	}
 
 	return(actual);
@@ -408,11 +411,11 @@ double rf_xtrx_set_tx_freq(void *h_,uint32_t ch,double freq)
 	res = xtrx_tune(h->dev,XTRX_TUNE_TX_FDD,freq,&actual);
 	if(res != 0)
 	{
-		XTRX_RF_ERROR("rf_xtrx_set_tx_freq: can't freq %f,err: %d\n",freq,res);
+		XTRX_RF_ERROR("xtrx_tune: can't freq %f,err: %d\n",freq,res);
 	}
 	else
 	{
-		XTRX_RF_INFO("rf_xtrx_set_tx_freq: actual freq %.2f Mhz\n",(actual / 1e6));
+		XTRX_RF_INFO("xtrx_tune: actual freq %.2f Mhz\n",(actual / 1e6));
 	}
 
 	return(actual);
