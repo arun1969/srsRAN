@@ -336,8 +336,8 @@ int rf_xtrx_set_tx_gain(void *h_,double gain)
 	if(gain > 30.0)
 		gain = 30.0;
 	
-	XTRX_RF_INFO("tx gain %f converted to (30.0-gain) = %f\n",gain,(30.0 - gain));
-	gain = 30.0 - gain;
+	XTRX_RF_INFO("tx gain %f converted to (30.0-gain) = %f\n",gain,(gain - 30.0));
+	gain = gain - 30.0;
 	res = xtrx_set_gain(h->dev,XTRX_CH_AB,XTRX_TX_PAD_GAIN,gain,&actual);
 	if(res != 0)
 	{
