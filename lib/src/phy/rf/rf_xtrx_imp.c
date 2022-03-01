@@ -200,10 +200,10 @@ int rf_xtrx_open(char *args,void **h_)
 	rf_xtrx_set_tx_srate(h,1.92e6);
 	rf_xtrx_set_rx_srate(h,1.92e6);
 	/* Set info structure */
-	h->info.min_tx_gain = 0.0;
-	h->info.max_tx_gain = 30.0;
-	h->info.min_rx_gain = -52.0;
-	h->info.max_rx_gain = 0.0;
+	h->info.min_tx_gain = -52.0;
+	h->info.max_tx_gain = 0.0;
+	h->info.min_rx_gain = 0.0;
+	h->info.max_rx_gain = 30.0;
 	return(SRSRAN_SUCCESS);
 }
 
