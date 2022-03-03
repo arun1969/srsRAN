@@ -482,7 +482,7 @@ int rf_xtrx_send_timed_multi(void *h_,void *data[SRSRAN_MAX_PORTS],int nsamples,
 	int res;
 	rf_xtrx_handler_t *h = h_;
 	xtrx_send_ex_info_t nfo;
-	uint64_t tx_ts = 0;
+	static uint64_t tx_ts = 0;
 
 	if(false == h->tx_stream_enabled)
 		rf_xtrx_start_tx_stream(h);
@@ -493,6 +493,8 @@ int rf_xtrx_send_timed_multi(void *h_,void *data[SRSRAN_MAX_PORTS],int nsamples,
 		srsran_timestamp_t ts = {.full_secs = secs,.frac_secs = frac_secs};
 		tx_ts = srsran_timestamp_uint64(&ts,h->tx_rate);
 	}
+	else
+		tx_ts += nsamples;	/* workaround for xtrx don't support tx without timestamp */
 
 	#if PRINT_TX_STATS
 	XTRX_RF_INFO("tx_time: nsamples=%d at tx_ts=%lu\n",nsamples,tx_ts);
