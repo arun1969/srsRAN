@@ -197,8 +197,8 @@ int rf_xtrx_open(char *args,void **h_)
 	h->tx_stream_enabled = false;
 
 	/* Set default sampling rates */
-	rf_xtrx_set_tx_srate(h,1.92e6);
-	rf_xtrx_set_rx_srate(h,1.92e6);
+//	rf_xtrx_set_tx_srate(h,1.92e6);
+//	rf_xtrx_set_rx_srate(h,1.92e6);
 	/* Set info structure */
 	h->info.min_tx_gain = -52.0;
 	h->info.max_tx_gain = 0.0;
@@ -261,20 +261,22 @@ static double rf_xtrx_set_srate_hz(rf_xtrx_handler_t *h,double srate_hz)
 double rf_xtrx_set_rx_srate(void *h_,double freq)
 {
 	int res = 0;
+	double bw;
 	double actualbw;
 	double srate_hz;
 	rf_xtrx_handler_t *h = h_;
 
 	srate_hz = rf_xtrx_set_srate_hz(h,freq);
 	actualbw = 0;
-	res = xtrx_tune_rx_bandwidth(h->dev,XTRX_CH_AB,srate_hz,&actualbw);
+	bw = srate_hz; // / 1.536; // need to improved
+	res = xtrx_tune_rx_bandwidth(h->dev,XTRX_CH_AB,bw,&actualbw);
 	if(res != 0)
 	{
-		XTRX_RF_ERROR("xtrx_tune_rx_bandwidth: can't rx bandwidth %f,err: %d\n",srate_hz,res);
+		XTRX_RF_ERROR("xtrx_tune_rx_bandwidth: can't set Rx bandwidth %f,err: %d\n",bw,res);
 	}
 	else
 	{
-		XTRX_RF_INFO("xtrx_tune_rx_bandwidth rx bandwidth %.2f Mhz\n",(actualbw / 1e6));
+		XTRX_RF_INFO("xtrx_tune_rx_bandwidth Rx bandwidth %.2f Mhz\n",(actualbw / 1e6));
 	}
 
 	return(srate_hz);
@@ -283,20 +285,22 @@ double rf_xtrx_set_rx_srate(void *h_,double freq)
 double rf_xtrx_set_tx_srate(void *h_,double freq)
 {
 	int res = 0;
+	double bw;
 	double actualbw;
 	double srate_hz;
 	rf_xtrx_handler_t *h = h_;
 
 	srate_hz = rf_xtrx_set_srate_hz(h,freq);
 	actualbw = 0;
-	res = xtrx_tune_tx_bandwidth(h->dev,XTRX_CH_AB,srate_hz,&actualbw);
+	bw = srate_hz; // / 1.536; // need to improved
+	res = xtrx_tune_tx_bandwidth(h->dev,XTRX_CH_AB,bw,&actualbw);
 	if(res != 0)
 	{
-		XTRX_RF_ERROR("xtrx_tune_tx_bandwidth: can't tx bandwidth %f,err: %d\n",srate_hz,res);
+		XTRX_RF_ERROR("xtrx_tune_tx_bandwidth: can't set Tx bandwidth %f,err: %d\n",bw,res);
 	}
 	else
 	{
-		XTRX_RF_INFO("xtrx_tune_tx_bandwidth tx bandwidth %.2f Mhz\n",(actualbw / 1e6));
+		XTRX_RF_INFO("xtrx_tune_tx_bandwidth Tx bandwidth %.2f Mhz\n",(actualbw / 1e6));
 	}
 
 	return(srate_hz);
@@ -311,11 +315,11 @@ int rf_xtrx_set_rx_gain(void *h_,double gain)
 	res = xtrx_set_gain(h->dev,XTRX_CH_AB,XTRX_RX_LNA_GAIN,gain,&actual);
 	if(res != 0)
 	{
-		XTRX_RF_ERROR("xtrx_set_gain: can't rx gain %f,err: %d\n",gain,res);
+		XTRX_RF_ERROR("xtrx_set_gain: can't set Rx gain %f,err: %d\n",gain,res);
 	}
 	else
 	{
-		XTRX_RF_INFO("xtrx_set_gain: rx gain %f\n",actual);
+		XTRX_RF_INFO("xtrx_set_gain: Rx gain %f\n",actual);
 	}
 
 	h->rx_gain = actual;
@@ -341,11 +345,11 @@ int rf_xtrx_set_tx_gain(void *h_,double gain)
 	res = xtrx_set_gain(h->dev,XTRX_CH_AB,XTRX_TX_PAD_GAIN,gain,&actual);
 	if(res != 0)
 	{
-		XTRX_RF_ERROR("xtrx_set_gain: can't tx gain %f,err: %d\n",gain,res);
+		XTRX_RF_ERROR("xtrx_set_gain: can't set Tx gain %f,err: %d\n",gain,res);
 	}
 	else
 	{
-		XTRX_RF_INFO("xtrx_set_gain: tx gain %f\n",actual);
+		XTRX_RF_INFO("xtrx_set_gain: Tx gain %f\n",actual);
 	}
 
 	h->tx_gain = actual;
@@ -397,11 +401,11 @@ double rf_xtrx_set_rx_freq(void *h_,uint32_t ch,double freq)
 	res = xtrx_tune(h->dev,XTRX_TUNE_RX_FDD,freq,&actual);
 	if(res != 0)
 	{
-		XTRX_RF_ERROR("xtrx_tune: can't freq %f,err: %d\n",freq,res);
+		XTRX_RF_ERROR("xtrx_tune: can't set Rx Freq %f,err: %d\n",freq,res);
 	}
 	else
 	{
-		XTRX_RF_INFO("xtrx_tune: actual freq %.2f Mhz\n",(actual / 1e6));
+		XTRX_RF_INFO("xtrx_tune: actual Rx Freq %.2f Mhz\n",(actual / 1e6));
 	}
 
 	return(actual);
@@ -416,11 +420,11 @@ double rf_xtrx_set_tx_freq(void *h_,uint32_t ch,double freq)
 	res = xtrx_tune(h->dev,XTRX_TUNE_TX_FDD,freq,&actual);
 	if(res != 0)
 	{
-		XTRX_RF_ERROR("xtrx_tune: can't freq %f,err: %d\n",freq,res);
+		XTRX_RF_ERROR("xtrx_tune: can't set Freq %f,err: %d\n",freq,res);
 	}
 	else
 	{
-		XTRX_RF_INFO("xtrx_tune: actual freq %.2f Mhz\n",(actual / 1e6));
+		XTRX_RF_INFO("xtrx_tune: actual Tx Freq %.2f Mhz\n",(actual / 1e6));
 	}
 
 	return(actual);
