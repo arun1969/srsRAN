@@ -44,6 +44,35 @@ void rf_xtrx_register_error_handler(void *h_,srsran_rf_error_handler_t new_handl
 	xtrx_error_handler_arg = arg;
 }
 
+// PRB  non standard standard
+// 6    1.92e6       1.92e6
+// 15   3.84e6       3.84e6
+// 25   5.76e6       7.68e6
+// 50   11.52e6      15.36e6
+// 75   15.36e6      23.04e6
+// 100  23.04e6      30.72e6
+double get_channel_bw(double rate)
+{
+	#ifdef FORCE_STANDARD_RATE
+	return(rate / 1.536);
+	#else
+
+	double rounded_rate = round(rate / 100) * 100;
+
+	if(rate < 5.76e6)
+		return(rate / 1.536);
+	else if(rounded_rate == 15.36e6)
+		return(15e6);
+	else
+		return(rounded_rate / 1.152);
+	#endif
+}
+
+double get_analog_filter_bw(double rate)
+{
+	return(get_channel_bw(rate) * ANALOG_LPF_COEFF);
+}
+
 const char* rf_xtrx_devname(void *h_)
 {
 	return(DEVNAME);
@@ -258,21 +287,21 @@ static double rf_xtrx_set_srate_hz(rf_xtrx_handler_t *h,double srate_hz)
 	return(srate_hz);
 }
 
-double rf_xtrx_set_rx_srate(void *h_,double freq)
+double rf_xtrx_set_rx_srate(void *h_,double rate)
 {
 	int res = 0;
-	double bw;
-	double actualbw;
+	double actualbw = 0;
 	double srate_hz;
 	rf_xtrx_handler_t *h = h_;
 
-	srate_hz = rf_xtrx_set_srate_hz(h,freq);
-	actualbw = 0;
-	bw = srate_hz; // / 1.536; // need to improved
-	res = xtrx_tune_rx_bandwidth(h->dev,XTRX_CH_AB,bw,&actualbw);
+	srate_hz = rf_xtrx_set_srate_hz(h,rate);
+	double filter_bw = get_analog_filter_bw(rate);
+	double analog_bw = filter_bw > 1.5e6 ? filter_bw : 1.5e6;
+
+	res = xtrx_tune_rx_bandwidth(h->dev,XTRX_CH_AB,analog_bw,&actualbw);
 	if(res != 0)
 	{
-		XTRX_RF_ERROR("xtrx_tune_rx_bandwidth: can't set Rx bandwidth %f,err: %d\n",bw,res);
+		XTRX_RF_ERROR("xtrx_tune_rx_bandwidth: can't set Rx bandwidth %f,err: %d\n",analog_bw,res);
 	}
 	else
 	{
@@ -282,21 +311,21 @@ double rf_xtrx_set_rx_srate(void *h_,double freq)
 	return(srate_hz);
 }
 
-double rf_xtrx_set_tx_srate(void *h_,double freq)
+double rf_xtrx_set_tx_srate(void *h_,double rate)
 {
 	int res = 0;
-	double bw;
-	double actualbw;
+	double actualbw = 0;
 	double srate_hz;
 	rf_xtrx_handler_t *h = h_;
 
-	srate_hz = rf_xtrx_set_srate_hz(h,freq);
-	actualbw = 0;
-	bw = srate_hz; // / 1.536; // need to improved
-	res = xtrx_tune_tx_bandwidth(h->dev,XTRX_CH_AB,bw,&actualbw);
+	srate_hz = rf_xtrx_set_srate_hz(h,rate);
+	double filter_bw = get_analog_filter_bw(rate);
+	double analog_bw = filter_bw > 5e6 ? filter_bw : 5e6;
+
+	res = xtrx_tune_tx_bandwidth(h->dev,XTRX_CH_AB,analog_bw,&actualbw);
 	if(res != 0)
 	{
-		XTRX_RF_ERROR("xtrx_tune_tx_bandwidth: can't set Tx bandwidth %f,err: %d\n",bw,res);
+		XTRX_RF_ERROR("xtrx_tune_tx_bandwidth: can't set Tx bandwidth %f,err: %d\n",analog_bw,res);
 	}
 	else
 	{
