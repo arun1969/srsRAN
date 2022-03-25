@@ -5,6 +5,7 @@
 #include "srsran/phy/rf/rf.h"
 
 #define DEVNAME "xtrx"
+#define ANALOG_LPF_COEFF	1
 
 enum xtrx_loglevel
 {
