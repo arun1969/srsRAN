@@ -9,7 +9,7 @@
 
 #define PRINT_TX_STATS 0
 #define PRINT_RX_STATS 0
-
+#define XTRX_CH	XTRX_CH_A
 cf_t zero_mem[64 * 1024];	/* dummy mem */
 
 typedef struct
@@ -92,10 +92,10 @@ int rf_xtrx_start_tx_stream(void *h_)
 	params.dir = XTRX_TX;
 	params.tx_repeat_buf = NULL;
 	params.tx.paketsize = 0;
-	params.tx.chs = XTRX_CH_AB;
+	params.tx.chs = XTRX_CH;
 	params.tx.wfmt = XTRX_WF_16;
 	params.tx.hfmt = XTRX_IQ_FLOAT32;
-	params.tx.flags = XTRX_RSP_SWAP_IQ|XTRX_RSP_SISO_MODE;
+	params.tx.flags = XTRX_RSP_SISO_MODE;
 	res = xtrx_run_ex(h->dev,&params);
 	if(res)
 	{
@@ -120,7 +120,7 @@ int rf_xtrx_start_rx_stream(void *h_,bool now)
 
 	params.dir = XTRX_RX;
 	params.rx.paketsize = 0;
-	params.rx.chs = XTRX_CH_AB;
+	params.rx.chs = XTRX_CH;
 	params.rx.wfmt = XTRX_WF_16;
 	params.rx.hfmt = XTRX_IQ_FLOAT32;
 	params.rx.scale = 32767;
@@ -298,7 +298,7 @@ double rf_xtrx_set_rx_srate(void *h_,double rate)
 	double filter_bw = get_analog_filter_bw(rate);
 	double analog_bw = filter_bw > 1.5e6 ? filter_bw : 1.5e6;
 
-	res = xtrx_tune_rx_bandwidth(h->dev,XTRX_CH_AB,analog_bw,&actualbw);
+	res = xtrx_tune_rx_bandwidth(h->dev,XTRX_CH,analog_bw,&actualbw);
 	if(res != 0)
 	{
 		XTRX_RF_ERROR("xtrx_tune_rx_bandwidth: can't set Rx bandwidth %f,err: %d\n",analog_bw,res);
@@ -322,7 +322,7 @@ double rf_xtrx_set_tx_srate(void *h_,double rate)
 	double filter_bw = get_analog_filter_bw(rate);
 	double analog_bw = filter_bw > 5e6 ? filter_bw : 5e6;
 
-	res = xtrx_tune_tx_bandwidth(h->dev,XTRX_CH_AB,analog_bw,&actualbw);
+	res = xtrx_tune_tx_bandwidth(h->dev,XTRX_CH,analog_bw,&actualbw);
 	if(res != 0)
 	{
 		XTRX_RF_ERROR("xtrx_tune_tx_bandwidth: can't set Tx bandwidth %f,err: %d\n",analog_bw,res);
@@ -341,7 +341,7 @@ int rf_xtrx_set_rx_gain(void *h_,double gain)
 	double actual = 0;
 	rf_xtrx_handler_t *h = h_;
 
-	res = xtrx_set_gain(h->dev,XTRX_CH_AB,XTRX_RX_LNA_GAIN,gain,&actual);
+	res = xtrx_set_gain(h->dev,XTRX_CH,XTRX_RX_LNA_GAIN,gain,&actual);
 	if(res != 0)
 	{
 		XTRX_RF_ERROR("xtrx_set_gain: can't set Rx gain %f,err: %d\n",gain,res);
@@ -371,7 +371,7 @@ int rf_xtrx_set_tx_gain(void *h_,double gain)
 	
 	XTRX_RF_INFO("tx gain %f converted to (30.0-gain) = %f\n",gain,(gain - 30.0));
 	gain = gain - 30.0;
-	res = xtrx_set_gain(h->dev,XTRX_CH_AB,XTRX_TX_PAD_GAIN,gain,&actual);
+	res = xtrx_set_gain(h->dev,XTRX_CH,XTRX_TX_PAD_GAIN,gain,&actual);
 	if(res != 0)
 	{
 		XTRX_RF_ERROR("xtrx_set_gain: can't set Tx gain %f,err: %d\n",gain,res);
