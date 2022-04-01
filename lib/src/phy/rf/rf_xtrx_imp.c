@@ -70,7 +70,8 @@ double get_channel_bw(double rate)
 
 double get_analog_filter_bw(double rate)
 {
-	return(get_channel_bw(rate) * ANALOG_LPF_COEFF);
+//	return(get_channel_bw(rate) * ANALOG_LPF_COEFF); Tobe Fixed commented for testin, as there is issue with bandwidth calibration
+	return((rate) * ANALOG_LPF_COEFF);
 }
 
 const char* rf_xtrx_devname(void *h_)
